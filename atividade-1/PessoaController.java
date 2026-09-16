@@ -1,83 +1,73 @@
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 public class PessoaController {
 
-    private Map<String, Pessoa> listaUsers;
+    private Map<String, Pessoa> registroPessoas;
 
     public PessoaController() {
-        this.listaUsers = new HashMap<>();
+        this.registroPessoas = new HashMap<String, Pessoa>();
     }
 
-    public void cadastraPessoa(String nome, int idade, String cpf, String telefone, String profissão) {
-        if (this.listaUsers.containsKey(cpf)) {
-            throw new IllegalArgumentException("Pessoa já cadastrada");
+    public void adicionaPessoa(String nome, String cpf, String profissao, int idade, String telefone) {
+        this.registroPessoas.put(cpf, new Pessoa(nome, cpf, profissao, idade, telefone));
+    }
+
+    public Pessoa searchPessoa(String cpf) {
+        return this.registroPessoas.get(cpf);
+    }
+
+    public void updatePessoa(String cpf, String profissao, int idade, String telefone) {
+        Pessoa p = this.registroPessoas.get(cpf);
+
+        if (p == null) {
+            throw new IllegalArgumentException("Pessoa Invalida");
         }
 
-        this.listaUsers.put(cpf, new Pessoa(nome, idade, cpf, telefone, profissão));
+        p.atualizaDados(profissao, idade, telefone);
     }
 
-    public Pessoa buscaPessoa(String cpf) {
-        return this.listaUsers.get(cpf);
+    public void deletePessoa(String cpf) {
+        this.registroPessoas.remove(cpf);
     }
 
-    public void deletaPessoa(String cpf) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
+    public void adicionaEndereco(String cpf, String rua, String cidade, int numero, String cep, String bairro) {
+        Pessoa p = this.registroPessoas.get(cpf);
+
+        if (p == null) {
+            throw new IllegalArgumentException("Pessoa Invalida");
         }
 
-        this.listaUsers.remove(cpf);
+        p.adicionaEndereco(rua, cidade, numero, cep, bairro);
     }
 
-    public boolean existePessoa(String cpf) {
-        return this.listaUsers.containsKey(cpf);
-    }
+    public void atualizaEndereco(String cpf, String rua, String cidade, int numero, String cep, String bairro, String cepAntigo, int numeroAntigo) {
+        Pessoa p = this.registroPessoas.get(cpf);
 
-    public void atualizaIdade(String cpf, int novaIdade) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
+        if (p == null) {
+            throw new IllegalArgumentException("Pessoa Invalida");
         }
 
-        this.listaUsers.get(cpf).setIdade(novaIdade);
+        p.atualizaEndereco(cepAntigo, numeroAntigo, rua, cidade, numero, cep, bairro);
     }
 
-    public void atualizaTelefone(String cpf, String novoTelefone) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
+    public Endereco getEndereco(String cpf, String cep, int numero) {
+        Pessoa p = this.registroPessoas.get(cpf);
+
+        if (p == null) {
+            throw new IllegalArgumentException("Pessoa Invalida");
         }
 
-        this.listaUsers.get(cpf).setTelefone(novoTelefone);
+        return p.getEndereco(cep, numero);
     }
 
-    public void atualizaProfissao(String cpf, String profissao) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
+    public void deleteEndereco(String cpf, String cep, int numero) {
+        Pessoa p = this.registroPessoas.get(cpf);
+
+        if (p == null) {
+            throw new IllegalArgumentException("Pessoa Invalida");
         }
 
-        this.listaUsers.get(cpf).setProfissao(profissao);
-    }
-
-    public void adicionaEndereco(String cpf, String rua, String bairro, String cep, int numero, String cidade) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
-        }
-
-        this.listaUsers.get(cpf).cadastraEndereco(rua, bairro, cep, numero, cidade);
-    }
-
-    public void removeEndereco(String cpf, int idEndereco) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
-        }
-
-        this.listaUsers.get(cpf).deletarEndereco(idEndereco);
-    }
-
-    public String showEnderecos(String cpf) {
-        if (!existePessoa(cpf)) {
-            throw new IllegalArgumentException("Pessoa não encontrada");
-        }
-
-        return this.listaUsers.get(cpf).showEnderecos();
+        p.deleteEndereco(cep, numero);
     }
 }

@@ -1,96 +1,101 @@
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.ArrayList;
 
 public class Pessoa {
-    private String nome;
+    private final String nome;
+    private final String cpf;
+    private String profissao;
     private int idade;
-    private String cpf;
     private String telefone;
-    private String profissão;
     private List<Endereco> enderecos;
 
-    public Pessoa(String nome, int idade, String cpf, String telefone, String profissão) {
+    public Pessoa(String nome, String cpf, String profissao, int idade, String telefone) {
         this.nome = nome;
-        this.idade = idade;
         this.cpf = cpf;
+        this.profissao = profissao;
+        this.idade = idade;
         this.telefone = telefone;
-        this.profissão = profissão;
-        this.enderecos = new ArrayList<>();
+        this.enderecos = new ArrayList<Endereco>();
     }
 
-    public boolean existeEndereco(String rua, String bairro, String cep, int numero, String cidade) {
+    public Endereco existeEndereco(String cep, int numero) {
         for (Endereco e : enderecos) {
-            if (e.enderecoGemeo(rua, bairro, numero, cep, cidade)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void cadastraEndereco(String rua, String bairro, String cep, int numero, String cidade) {
-        if (existeEndereco(rua, bairro, cep, numero, cidade)) {
-            throw new IllegalArgumentException("Endereço existente");
-        }
-
-        this.enderecos.add(new Endereco(rua, bairro, numero, cep, cidade));
-    }
-
-    public void deletarEndereco(int id) {
-        Endereco endRemover = null;
-
-        for (Endereco e : this.enderecos) {
-            if (e.getId() == id) {
-                endRemover = e;
-                break;
+            if (e.getCep().equals(cep) && e.getNumero() == numero) {
+                return e;
             }
         }
 
-        if (endRemover == null) {
-            throw new IllegalArgumentException("Endereço Inexistente");
-        }
-
-        this.enderecos.remove(endRemover);
+        return null;
     }
 
-    public String showEnderecos() {
-        return this.enderecos.toString();
+    public void adicionaEndereco(String rua, String cidade, int numero, String cep, String bairro) {
+        if (existeEndereco(cep, numero) == null) {
+            this.enderecos.add(new Endereco(rua, cidade, numero, cep, bairro));
+        }
+    }
+
+    public Endereco getEndereco(String cep, int numero) {
+        return existeEndereco(cep, numero);
+    }
+
+    public void atualizaEndereco(String cepAntigo, int numeroAntigo, String rua, String cidade, int numero, String cep, String bairro) {
+        Endereco e = existeEndereco(cep, numero);
+
+        if (e == null) {
+            throw new IllegalArgumentException("Endereco Invalido");
+        }
+
+        e.setBairro(bairro);
+        e.setCep(cep);
+        e.setCidade(cidade);
+        e.setNumero(numero);
+        e.setRua(rua);
+    }
+
+    public void deleteEndereco(String cep, int numero) {
+        Endereco e = existeEndereco(cep, numero);
+
+        if (e == null) {
+            throw new IllegalArgumentException("Endereco Invalido");
+        }
+
+        this.enderecos.remove(e);
     }
 
     public String getNome() {
         return nome;
     }
 
-    public int getIdade() {
-        return idade;
-    }
-
     public String getCpf() {
         return cpf;
     }
 
-    public String getTelefone() {
-        return telefone;
+    public String getProfissao() {
+        return profissao;
     }
 
-    public String getProfissão() {
-        return profissão;
+    public void setProfissao(String profissao) {
+        this.profissao = profissao;
     }
 
-    public List<Endereco> getEnderecos() {
-        return enderecos;
+    public int getIdade() {
+        return idade;
     }
 
     public void setIdade(int idade) {
         this.idade = idade;
     }
 
+    public String getTelefone() {
+        return telefone;
+    }
+
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
 
-    public void setProfissao(String profissão) {
-        this.profissão = profissão;
+    public List<Endereco> getEnderecos() {
+        return enderecos;
     }
 
     public void setEnderecos(List<Endereco> enderecos) {
@@ -98,25 +103,41 @@ public class Pessoa {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Pessoa pessoa = (Pessoa) o;
-        return Objects.equals(cpf, pessoa.cpf);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((cpf == null) ? 0 : cpf.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(cpf);
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Pessoa other = (Pessoa) obj;
+        if (cpf == null) {
+            if (other.cpf != null)
+                return false;
+        } else if (!cpf.equals(other.cpf))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-        return "Pessoa{" +
-                "nome='" + nome + '\'' +
-                ", idade=" + idade +
-                ", cpf='" + cpf + '\'' +
-                ", telefone='" + telefone + '\'' +
-                ", profissão='" + profissão +
-                '}';
+        return "Pessoa [nome=" + nome + ", cpf=" + cpf + ", profissao=" + profissao + ", idade=" + idade + ", telefone="
+                + telefone + "]";
     }
+
+    public void atualizaDados(String profissao, int idade, String telefone) {
+        this.profissao = profissao;
+        this.telefone = telefone;
+        this.idade = idade;
+    }
+
+
 }
